@@ -202,6 +202,8 @@ int main() {
         cout << "\n--- PRE-FLOP ---\n";
         if (!bettingRound(money, pot, player)) goto endRound;
 
+        clearScreen();
+        Head()
         cout << "\n--- FLOP ---\n";
         print({board[0], board[1], board[2]});
         if (!bettingRound(money, pot, player)) goto endRound;
