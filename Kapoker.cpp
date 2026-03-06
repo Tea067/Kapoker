@@ -4,6 +4,8 @@
 #include <random>
 #include <map>
 #include <string>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -126,10 +128,56 @@ bool bettingRound(int &money, int &pot, const vector<Card>& player) {
     return true;
 }
 
+void clearScreen() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+void printRules() {
+    cout << "=== CHAOS HOLD'EM RULES ===\n";
+    cout << "1. You start with $100.\n";
+    cout << "2. Each round consists of Pre-flop, Flop, Turn, and River betting rounds.\n";
+    cout << "3. In each betting round, you can Call (10), Raise, or Fold.\n";
+    cout << "4. After the River, a random Chaos Event occurs that can affect the game state.\n";
+    cout << "5. The best 5-card hand wins the pot at showdown.\n";
+    cout << "6. If you run out of money, the game ends.\n";
+    cout << "=============================\n\n";
+} 
+
+void Head(){
+    cout << R"(
+   ____ _               _             
+  / ___| |__   ___  ___| | _____ _ __ 
+ | |   | '_ \ / _ \/ __| |/ / _ \ '__|
+ | |___| | | | (_) \__ \   <  __/ |   
+  \____|_| |_|\___/|___/_|\_\___|_|   
+                                       
+)"
+ << endl;
+   printRules();
+}
+
+int startMenu() {
+    clearScreen();
+    Head();
+    cout << "\n1. Start Game\n";
+    cout << "2. Exit\n";
+    cout << "Choose an option (1-2): ";
+    
+    int choice;
+    cin >> choice;
+    
+    return choice;
+}
+
 void chaosEvent(int &pot, vector<Card>& board, vector<Card>& player, vector<Card>& dealer, vector<Card>& deck) {
 
     int chaos = rand() % 4;
-
+    clearScreen();
+    Head();
     cout << "\n===== CHAOS EVENT =====\n";
 
     if (chaos == 0) {
@@ -163,6 +211,8 @@ void chaosEvent(int &pot, vector<Card>& board, vector<Card>& player, vector<Card
         cout << "PLAYER AND DEALER SWAP FIRST CARD!\n";
 
         swap(player[0], dealer[0]);
+        cout << "Board: ";
+        print(board);
     }
 
     cout << "=======================\n";
@@ -172,11 +222,24 @@ int main() {
 
     srand(time(0));
 
+    int menu;
+
+    while (true) {
+
+        menu = startMenu();
+
+        if (menu == 1) break;
+
+        if (menu == 2) {
+            cout << "Goodbye!\n";
+            return 0;
+        }
+    }
+
     int money = 100;
 
     char again = 'y';
 
-    cout << "=== CHAOS HOLD'EM ===\n";
 
     while (again == 'y' || again == 'Y') {
 
@@ -195,60 +258,69 @@ int main() {
         vector<Card> dealer = {d[2], d[3]};
         vector<Card> board  = {d[4], d[5], d[6], d[7], d[8]};
 
+        vector<Card> p7, d7;
+        int ps, ds;
+
         cout << "\nYour money: $" << money << endl;
         cout << "Your cards: ";
         print(player);
-
+        
+        clearScreen();
+        Head();
         cout << "\n--- PRE-FLOP ---\n";
         if (!bettingRound(money, pot, player)) goto endRound;
 
         clearScreen();
-        Head()
+        Head();
         cout << "\n--- FLOP ---\n";
         print({board[0], board[1], board[2]});
         if (!bettingRound(money, pot, player)) goto endRound;
 
+        clearScreen();
+        Head();
         cout << "\n--- TURN ---\n";
         print({board[0], board[1], board[2], board[3]});
         if (!bettingRound(money, pot, player)) goto endRound;
 
+        clearScreen();
+        Head();
         cout << "\n--- RIVER ---\n";
         print(board);
         if (!bettingRound(money, pot, player)) goto endRound;
 
         chaosEvent(pot, board, player, dealer, d);
 
-        {
-            vector<Card> p7 = player;
-            vector<Card> d7 = dealer;
+        
+        p7 = player;
+        d7 = dealer;
 
-            p7.insert(p7.end(), board.begin(), board.end());
-            d7.insert(d7.end(), board.begin(), board.end());
+        p7.insert(p7.end(), board.begin(), board.end());
+        d7.insert(d7.end(), board.begin(), board.end());
 
-            int ps = eval7(p7);
-            int ds = eval7(d7);
+        ps = eval7(p7);
+        ds = eval7(d7);
 
-            cout << "\n--- SHOWDOWN ---\n";
+        cout << "\n--- SHOWDOWN ---\n";
 
-            cout << "Dealer cards: ";
-            print(dealer);
-            cout << "Your cards: ";
-            print(player);
+        cout << "Dealer cards: ";
+        print(dealer);
+        cout << "Your cards: ";
+        print(player);
 
-            if (ps > ds) {
-                money += pot;
-                cout << "YOU WIN $" << pot << endl;
-            }
-
-            else if (ps < ds) {
-                cout << "DEALER WINS\n";
-            }
-
-            else {
-                money += pot / 2;
-                cout << "DRAW\n";
-            }
+        if (ps > ds) {
+            money += pot;
+            cout << "YOU WIN $" << pot << endl;
         }
+
+        else if (ps < ds) {
+        cout << "DEALER WINS\n";
+        }
+
+        else {
+            money += pot / 2;
+           cout << "DRAW\n";
+        }
+        
 
     endRound:
 
