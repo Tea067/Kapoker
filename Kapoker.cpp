@@ -173,49 +173,99 @@ int startMenu() {
     return choice;
 }
 
-void chaosEvent(int &pot, vector<Card>& board, vector<Card>& player, vector<Card>& dealer, vector<Card>& deck) {
+void chaosEvent(int &pot, vector<Card>& board, vector<Card>& player, vector<Card>& dealer, vector<Card>& deck){
 
-    int chaos = rand() % 4;
+    int chaos = rand()%10;
+
     clearScreen();
     Head();
-    cout << "\n===== CHAOS EVENT =====\n";
 
-    if (chaos == 0) {
-        cout << "POT DOUBLED!\n";
-        pot *= 2;
+    cout << "\n=== CHAOS EVENT ===\n";
+
+    if(chaos==0){
+
+        cout<<"POT DOUBLED!\n";
+        pot*=2;
+
     }
 
-    else if (chaos == 1) {
+    else if(chaos==1){
 
-        cout << "EXTRA COMMUNITY CARD!\n";
-
+        cout<<"EXTRA COMMUNITY CARD!\n";
         board.push_back(deck[9]);
 
-        cout << "Board: ";
-        print(board);
     }
 
-    else if (chaos == 2) {
+    else if(chaos==2){
 
-        cout << "LAST BOARD CARD REMOVED!\n";
+        cout<<"LAST BOARD CARD REMOVED!\n";
 
-        if (!board.empty())
+        if(!board.empty())
             board.pop_back();
 
-        cout << "Board: ";
-        print(board);
     }
 
-    else {
+    else if(chaos==3){
 
-        cout << "PLAYER AND DEALER SWAP FIRST CARD!\n";
+        cout<<"PLAYER AND DEALER SWAP FIRST CARD!\n";
+        swap(player[0],dealer[0]);
 
-        swap(player[0], dealer[0]);
-        cout << "Board: ";
-        print(board);
     }
 
-    cout << "=======================\n";
+    else if(chaos==4){
+
+        cout<<"PLAYER DRAWS EXTRA CARD!\n";
+        player.push_back(deck[10]);
+
+    }
+
+    else if(chaos==5){
+
+        cout<<"DEALER DRAWS EXTRA CARD!\n";
+        dealer.push_back(deck[11]);
+
+    }
+
+    else if(chaos==6){
+
+        cout<<"A RANDOM BOARD CARD BURNS!\n";
+
+        if(!board.empty()){
+            int r = rand()%board.size();
+            board.erase(board.begin()+r);
+        }
+
+    }
+
+    else if(chaos==7){
+
+        cout<<"CHAOS TAX! $10 ADDED TO POT!\n";
+
+        pot += 10;
+
+    }
+
+    else if(chaos==8){
+
+        cout<<"POT CUT IN HALF!\n";
+
+        pot/=2;
+
+    }
+
+    else{
+
+        cout<<"WILD RIVER! LAST CARD REPLACED!\n";
+
+        if(!board.empty())
+            board.back() = deck[12];
+
+    }
+
+    cout<<"Board: ";
+    print(board);
+
+    cout<<"===================\n";
 }
 
 int main() {
